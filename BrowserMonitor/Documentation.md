@@ -48,7 +48,7 @@ These properties help keep track of a `BrowserMonitor`'s progress and can be use
 | update | `void` | Public | Writes an object into a JavaScript file to be consumed by the HTML file's interval script. |
 | begin | `void` | Public | Writes both the JS and HTML files, then executes the HTML file to bring it up in the web browser.
 | end | `void` | Public | Writes an `{ END : true }` message to the JS file, ending the process.
-| toJSON | `object` | Public | Used to prepare the `BrowserMonitor` instace for the `JSON.stringify()` method. Removes the [`htmlTemplate`](#BrowserMonitorJsContent) property string to avoid JSON-related problems. This method is useful when transferring this object to a child process script such as a separate code block or file to be executed in a different application via `BridgeTalk`.
+| toJSON | `object` | Public | Used to prepare the `BrowserMonitor` instace for the `JSON.stringify()` method. Removes the [`htmlTemplate`](#BrowserMonitor-Properties) property string to avoid JSON-related problems. This method is useful when transferring this object to a child process script such as a separate code block or file to be executed in a different application via `BridgeTalk`.
 | fromJSON | `BrowserMonitor` | Static | Creates an instance of the `BrowserMonitor` from a JSON string.
 
 ## BrowserMonitorTimeoutOptions Object
