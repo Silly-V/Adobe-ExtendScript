@@ -3,6 +3,8 @@
 
 This ExtendScript project writes and opens an HTML file which repeatedly queries a pre-determined JavaScript file which in turn is repeatedly written-to by an ongoing ExtendScript routine.
 
+![Completion-Test-Image](images/CompletionTest-e.gif)
+
 ### Why?
 Adobe JSX (ExtendScript) provides a ScriptUI api which is capable of creating progress bars and custom UI which theoretically are enough to meet most automation interface needs. However, they are unreliable and can possess nuances regarding cross-application and cross-platform operations which may impact development goals and times. A case-in-point is Illustrator's lack of checkable list items in a listbox (up to date of this writing in May, 2021 going years back to when it used to work) whereas other apps don't have the same problem.
 

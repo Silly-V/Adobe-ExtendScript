@@ -14,6 +14,8 @@ The folder _Test Documents_ contains these files:
 
 * _BrowserMonitorTestDoc-1-with-fatal-error<area>.ai_ - This file contains a shape called "REALLY BAD" in the layers panel. When the JSX script detects this name and adds a fatal error to the progress monitor as well as throwing the error to stop the JSX execution.
 
+![Completion-Test-Image](images/FatalErrorTest-e.gif)
+
 ## Instructions
 Open one of the test .ai files and run the script _BrowserMonitorTest.jsx_. The first time this is ran, a system dialog may pop up asking if you wish to open the HTML file in a browser. If this happens, click on the browser of your choice and ensure the "Always open with" checkbox is checked so this does not occur again. Additionally if this was the case, chances are that the JSX script has written multiple messages to the progress monitor while the system box was up - this would cause unexpected indications in the web page when it does come up. If this box is dismissed for all-time, this situation won't happen again.
 
