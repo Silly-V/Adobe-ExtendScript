@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<!-- No single quotes in this file. -->
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta author="Vasily Hall">
+	<meta author-email="vasily.hall@gmail.com">
+	<meta org="Vantage Business Automation Solutions LLC">
+	<title>BrowserMonitor</title>
+	<style>
+		body {
+			display: flex;
+			align-items: center;
+			flex-direction: column;
+			font-family: Arial, Helvetica, sans-serif;
+			margin: 0;
+		}
+		#error-display {
+			display: block;
+			background-color: #ffd4d4;
+			padding: 10px;
+			border-radius: 6px;
+			color: #B50000;
+			box-shadow: 0px 1px 4px #f00
+		}
+		#meta-heading {
+			padding: 5px;
+			background-color: #44ca77;
+			width: calc(100% - 10px);
+			text-align: center;
+		}
+		#meta-heading > span {
+			font-size: 0.65em;
+		}
+		#color-marker {
+			width: 270px;
+			height: 20px;
+			position: absolute;
+			right: 5px;
+			top: 4px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+		#progress {
+			width: 80vw;
+			background-color: #CCC;
+			height: 40px;
+			border-radius: 20px;
+			overflow: hidden;
+			margin-bottom: 20px;
+		}
+		#progress-line {
+			height: 100%;
+			background-color: rgb(37, 126, 2);
+			color: #FFF;
+			display: flex;
+			align-items: center;
+			justify-content: flex-start;
+			border-radius: 20px;
+			user-select: none;
+			width: 100%;
+			overflow: scroll;
+			overflow-y: hidden;
+			scrollbar-width: none;
+		}
+		#progress-line::-webkit-scrollbar {
+			height: 2px;
+		}
+		.step-marker {
+			background-color: #22a90e;
+			text-align: center;
+			margin: 1px;
+			font-size: 0.75em;
+			border-radius: 10px;
+			cursor: pointer;
+			color: #dcdcdc;
+			position: relative;
+			top: 15px;
+			flex: 1 1;
+			flex-basis: 20px;
+		}
+		.step-marker:hover {
+			color: #FFF;
+		}
+		.step-marker.error {
+			background-color: #af4a4a;
+		}
+		#progress-annotation {
+			top: -28px;
+			position: relative;
+			left: 50%;
+			width: 100px;
+			transform: translate(-50px);
+			display: block;
+			text-align: center;
+			color: #fdff9b;
+			text-shadow: 1px 1px 2px #000;
+		}
+		#main {
+			display: flex;
+			align-items: center;
+			flex-direction: column;
+			z-index: 1;
+			background-color: #FFF;
+			padding: 10px;
+			border: 1px solid #CCC;
+			margin-bottom: 11px;
+			border-radius: 28px;
+			position: relative;
+			max-width: calc(100% - 200px);
+		}
+		#main.open {
+			min-height: 220px;
+		}
+		#lines {
+			line-height: 150%;
+		}
+		#lines > span {
+			min-height: 20px;
+			min-width: 20px;
+			display: inline-block;
+		}
+		#notifications {
+			text-align: center;
+			line-height: 200%;
+		}
+		button {
+			height: 50px;
+			border-radius: 36px;
+			border: 1px solid #666;
+			font-size: 1.5em;
+			line-height: 178%;
+			padding-left: 10px;
+			padding-right: 10px;
+			background-color: #EFEFEF;
+			cursor: pointer;
+		}
+		#toggle-button {
+			position: absolute;
+			bottom: 5px;
+		}
+		#keep-open {
+			margin:auto;
+			margin-top: 20px;
+		}
+		#inactivity-counter {
+			display: block;
+			font-size: 1.85em;
+			margin-top: -76px;
+			margin-bottom: 0px;
+			position: relative;
+		}
+		svg {
+			position: relative;
+			transform: rotate(90deg) scale(-1);
+			stroke-dasharray: 251;
+			stroke-dashoffset: 0;
+		}
+		.error-item {
+			color: #B50000;
+		}
+		#past-list {
+			border-top: 1px solid #666;
+			position: relative;
+			max-width: calc(100% - 300px);
+		}
+		@media screen and (max-width: 600px) {
+			#past-list {
+				max-width: calc(100% - 50px);
+			}
+			#main {
+				max-width: 100%;
+			}
+		}
+		.fatal-error-list-item {
+			font-weight: bold;
+			color: #B50000;
+		}
+		tr, td {
+			position: relative;
+			overflow-wrap: anywhere;
+		}
+		td:first-child {
+			min-width: 115px;
+		}
+		.name-span {
+			color: #BBB;
+		}
+		#step-timer {
+			position: absolute;
+			bottom: 8px;
+			right: 15px;
+		}
+		#global-timer {
+			position: absolute;
+			bottom: 8px;
+			left: 15px;
+		}
+		[data-sub-index]::after,
+		[data-progress-value-index]::after {
+			content: "";
+			position: absolute;
+			left: -30px;
+			top: 0px;
+			height: 20px;
+			text-align: center;
+			line-height: 135%;
+			padding: 2px;
+			min-width: 20px;
+			font-weight: bold;
+			background-color: rgb(68, 0, 255);
+			border-radius: 50%;
+			color: #FFF;
+		}
+		[data-progress-value-index]::after {
+			background-color: rgb(255, 0, 140);
+			content: attr(data-progress-value-index);
+		}
+		[data-sub-index]::after {
+			content: attr(data-sub-index);
+		}
+		@keyframes offsettozero {
+			to {
+				stroke-dashoffset: 251;
+			}
+		}
+		@keyframes colorMorph { 
+			from { background-color: #22a90e; } 
+			to { background-color: #a0a220; }
+		}
+		@keyframes colorMorphWithError { 
+			from { background-color: #af4a4a; } 
+			to { background-color: #a0a220; }
+		}
+		[data-marker]:last-of-type[title^="In"]:not(.error) {
+			animation: colorMorph 0.6s infinite alternate;
+		}
+		[data-marker]:last-of-type[title^="In"].error {
+			animation: colorMorphWithError 0.6s infinite alternate;
+		}
+	</style>
+	<script>
+		window.onerror = function (message, b, c, d, e) {
+			console.log(message);
+			console.log(b);
+			console.log(c);
+			console.log(d);
+			console.log(e);
+			const errorDisplayElement = document.getElementById("error-display");
+			errorDisplayElement.style.display = "block";
+			errorDisplayElement.innerText = /** @type {string} */ (message);
+		};
+		window.onbeforeunload = function () {
+			return true;
+		};
+		window.onload = function () {
+			function formatSeconds (s) {
+				return (s - (s %= 60)) / 60 + (9 < s? ":" : ":0") + s;
+			}
+			function setInnerHTMLWithScript (elm, html) {
+				elm.innerHTML = html;
+				Array.from(elm.querySelectorAll("script")).forEach( oldScript => {
+					const newScript = document.createElement("script");
+					Array.from(oldScript.attributes)
+						.forEach( attr => newScript.setAttribute(attr.name, attr.value) );
+					newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+					oldScript.parentNode.replaceChild(newScript, oldScript);
+				});
+			}
+			function getAnnotation (val, maxval) {
+				return val + " of " + maxval;
+			}
+			function getProgressWidth (val, maxval) {
+				return (val > 0)? ((val / maxval) * 100).toString() + "%" : "0%";
+			}
+			function startAutoCloseProgress (seconds) {
+				toggleMinimizeElement.style.display = "none";
+				setTimeout(() => {
+					circleProgressElement.style.opacity = "1";
+					keepOpenElement.style.display = "block";
+					circleProgressElement.style.animation = `offsettozero ${seconds}s linear forwards`;
+				}, 350);
+			}
+			function resetAutoCloseProgress () {
+				circleProgressElement.style.animation = "";
+				keepOpenElement.style.display = "none";
+				circleProgressElement.style.opacity = "0";
+			}
+			function toggleMinimizeProgressBar () {
+				if (!isProgressBarZoneMinimized && (closingTimeout != null || postCompletionTimeout != null)) {
+					return;
+				}
+				isProgressBarZoneMinimized = !isProgressBarZoneMinimized;
+				if (isProgressBarZoneMinimized) {
+					mainElement.classList.remove("open");
+					linesContainerElement.style.display = "none";
+					notificationMessageElement.parentElement.style.display = "none";
+					toggleMinimizeElement.innerText = "\uD83D\uDD3D";
+				} else {
+					linesContainerElement.style.display = "block";
+					mainElement.classList.add("open");
+					if (closingTimeout != null || postCompletionTimeout != null) {
+						notificationMessageElement.parentElement.style.display = "block";
+					}
+					toggleMinimizeElement.innerText = "\uD83D\uDD3C";
+				}
+			}
+			function cancelAutoClose () {
+				if (isAutoCloseCancelled) {
+					window.close();
+				} else {
+					if (postCompletionTimeout != null) {
+						clearInterval(postCompletionTimeout);
+						postCompletionTimeout = null;
+					}
+					if (closingTimeout != null) {
+						clearInterval(closingTimeout);
+						closingTimeout = null;
+					}
+					notificationMessageElement.style.display = "none";
+					inactivityCounterElement.style.display = "none";
+					circleProgressElement.style.display = "none";
+					isAutoCloseCancelled = true;
+					keepOpenElement.innerText = "Close";
+				}
+			}
+			function setStepTimer () {
+				if (stepTimerInterval != null) {
+					clearInterval(stepTimerInterval);
+					stepTimerInterval = null;
+					const dataProgressElems = document.querySelectorAll(`[data-marker]`);
+					if (dataProgressElems.length) {
+						const lastMarker = dataProgressElems[dataProgressElems.length - 1];
+						lastMarker.title = lastMarker.innerText + " | " + formatSeconds(stepTimerSeconds);
+					}
+				}
+				stepTimerSeconds = 0;
+				stepTimerInterval = setInterval(() => {
+					stepTimerElement.innerText = formatSeconds(stepTimerSeconds);
+					stepTimerSeconds++;
+				}, 1000);
+			}
+			function clearStepTimerAtEnd (color) {
+				if (stepTimerInterval != null) {
+					clearInterval(stepTimerInterval);
+					stepTimerInterval = null;
+					stepTimerElement.style.color = color;
+					const dataProgressElems = document.querySelectorAll(`[data-marker]`);
+					if (dataProgressElems.length) {
+						const lastMarker = dataProgressElems[dataProgressElems.length - 1];
+						lastMarker.title = lastMarker.innerText + " | " + formatSeconds(stepTimerSeconds);
+					}
+				}
+			}
+			function setGlobalDurationTimer () {
+				globalDurationInterval = setInterval(() => {
+					globalTimerElement.innerText = formatSeconds(totalSeconds);
+					totalSeconds++;
+				}, 1000);
+			}
+			function stopGlobalTimer () {
+				if (globalDurationInterval != null) {
+					clearInterval(globalDurationInterval);
+					globalDurationInterval = null;
+				}
+				globalTimerElement.parentElement.children[0].innerHTML = "&#8987;";
+			}
+			function addToPastList (scriptContent) {
+				const previousIndex = document.querySelectorAll(`[id^="list-item"]`).length;
+				const divider = document.createElement("tr");
+
+				const dividerContent = document.createElement("td");
+				dividerContent.colSpan = 2;
+				dividerContent.style.borderBottom = "1px solid #F0F";
+				divider.append(dividerContent);
+
+				let listItemRow;
+				let hasExistingProgressValue = false;
+				let existingProgressItem;
+				const reversedKeys = Object.keys(scriptContent).reverse();
+				const hasProgressValueProperty = scriptContent.progressValue != undefined;
+				const hasProgressMaxValueProperty = scriptContent.progressMaxValue != undefined;
+				const transformedScriptContent = {};
+				if (hasProgressValueProperty) {
+					transformedScriptContent.progressValue = scriptContent.progressValue;
+				}
+				if (hasProgressMaxValueProperty && scriptContent.progressMaxValue != initMaxValue) {
+					transformedScriptContent.progressMaxValue = scriptContent.progressMaxValue;
+				}
+				for (let k of reversedKeys) {
+					if (k != "progressValue" && k != "progressMaxValue") {
+						transformedScriptContent[k] = scriptContent[k];
+					}
+				}
+				const objKeys = Object.keys(transformedScriptContent);
+				let index;
+				let counter = 0;
+				for (let k of objKeys) {
+					if (transformedScriptContent[k] === "") {
+						continue;
+					}
+					const isFirstKey = counter == 0;
+					counter++;
+					listItemRow = document.createElement("tr");
+					if (isFirstKey) {
+						index = (previousIndex + 1);
+						listItemRow.id = "list-item-" + index;
+					}
+					if (k == "error") { listItemRow.classList.add("error-item"); }
+					if (k == "isFatalError" && transformedScriptContent[k] === true) { listItemRow.classList.add("fatal-error-list-item") }
+					const nameSpan = document.createElement("td");
+					nameSpan.classList.add("name-span");
+					nameSpan.innerText = k;
+					if (isFirstKey) {
+						nameSpan.setAttribute("data-index", index.toString());
+					}
+					if (k == "progressValue") {
+						progressValueCount = transformedScriptContent[k];
+						const possibleExistingItems = document.querySelectorAll(`[data-progress-value-index="${progressValueCount}"]`);
+						if (possibleExistingItems.length > 0) {
+							hasExistingProgressValue = true;
+							existingProgressItem = possibleExistingItems[0].parentNode;
+						} else {
+							subItemCount = 1;
+							nameSpan.setAttribute("data-progress-value-index", transformedScriptContent[k]);
+						}
+					} else if (isFirstKey && !hasProgressValueProperty) {
+						const possibleExistingItems = document.querySelectorAll(`[data-progress-value-index="${progressValueCount}"]`);
+						if (possibleExistingItems.length > 0) {
+							hasExistingProgressValue = true;
+							existingProgressItem = possibleExistingItems[0].parentNode;
+						}
+					}
+					const valueSpan = document.createElement("td");
+					if (k.indexOf("html_") == 0) {
+						if (transformedScriptContent[k] && transformedScriptContent[k].includes("<script>") && transformedScriptContent[k].includes("<\/s" + "cript>")) {
+							setInnerHTMLWithScript(valueSpan, transformedScriptContent[k]);
+						} else {
+							valueSpan.innerHTML = transformedScriptContent[k];
+						}
+					} else {
+						valueSpan.innerText = transformedScriptContent[k];
+					}
+					listItemRow.append(nameSpan);
+					listItemRow.append(valueSpan);
+					if (k.indexOf("meta_") == 0) {
+						listItemRow.setAttribute(`data-${k}`, encodeURIComponent(transformedScriptContent[k]));
+						valueSpan.style.color = "#97aab3";
+					}
+					if (k == "END" && transformedScriptContent[k] === true) {
+						listItemRow.style.backgroundColor = "#00ffd7";
+						nameSpan.style.fontWeight = "bold";
+						nameSpan.style.color = "#000";
+					}
+					if (hasExistingProgressValue) {
+						existingProgressItem.parentNode.insertBefore(listItemRow, existingProgressItem.nextSibling);
+						if (isFirstKey) {
+							nameSpan.setAttribute(`data-sub-index`, (subItemCount++).toString());
+						}
+					} else {
+						pastListElement.prepend(listItemRow);
+					}
+				}
+
+				if (hasExistingProgressValue) {
+					/** @type {HTMLElement} */
+					const existingValuesDivider = (/** @type {HTMLElement} */ (divider.cloneNode(true)).children[0]);
+					existingValuesDivider.style.borderBottom = "1px solid #EEE";
+					existingProgressItem.parentNode.insertBefore(existingValuesDivider, existingProgressItem.nextSibling);
+				} else {
+					pastListElement.prepend(divider);
+				}
+			}
+
+			let initMaxValue = Number("21"); if (isNaN(initMaxValue)) { initMaxValue = 10; }
+			let currentValue = Number("0"); if (isNaN(currentValue)) { currentValue = 0; }
+			const initValue = currentValue;
+			let initTitle = "My Progress";
+			let initSubtitle = "";
+			let initInactivityTimeoutMinutes = Number("10"); if (isNaN(initInactivityTimeoutMinutes)) { initInactivityTimeoutMinutes = 10; };
+			let initAutoCloseSeconds = Number("160"); if (isNaN(initAutoCloseSeconds)) { initAutoCloseSeconds = 160; };
+			let initPostCompletionSeconds = Number("30"); if (isNaN(initPostCompletionSeconds)) { initPostCompletionSeconds = 30; };
+			let initLoopMilliseconds = Number("200"); if (isNaN(initLoopMilliseconds)) { initLoopMilliseconds = 500; };
+			const jsFilePath = "file://C:/Users/vasil/OneDrive/Documents/GitHub Repos/Adobe-ExtendScript/BrowserMonitor/BrowserMonitor-Browser-Monitor-Test-Script.js";
+			let stepTimerInterval = null;
+			let stepTimerSeconds = 0;
+			let globalDurationInterval = null;
+			let totalSeconds = 0;
+
+			const mainElement = document.getElementById("main");
+			const progressLineElement = document.getElementById("progress-line");
+			const progressAnnotationElement = document.getElementById("progress-annotation");
+			const linesContainerElement = document.getElementById("lines");
+			const line_1_element = document.getElementById("line_1");
+			const line_2_element = document.getElementById("line_2");
+			const line_3_element = document.getElementById("line_3");
+			const titleElement = document.getElementById("title");
+			const subtitleElement = document.getElementById("subtitle");
+			const notificationMessageElement = document.getElementById("notification-message");
+			const inactivityCounterElement = document.getElementById("inactivity-counter");
+			const circleProgressElement = document.getElementById("circle-progress");
+			const keepOpenElement = document.getElementById("keep-open");
+			const errorElement = document.getElementById("error");
+			const pastListElement = document.querySelectorAll("#past-list tbody")[0];
+			const toggleMinimizeElement = document.getElementById("toggle-button");
+			const stepTimerElement = document.getElementById("step-timer").children[1];
+			const globalTimerElement = document.getElementById("global-timer").children[1];
+
+			toggleMinimizeElement.onclick = toggleMinimizeProgressBar;
+			keepOpenElement.onclick = cancelAutoClose;
+			const randomRgbPart = () => Math.floor(Math.random() * 256);
+			document.getElementById("color-marker").style.backgroundColor = `rgb(${randomRgbPart()}, ${randomRgbPart()}, ${randomRgbPart()})`;
+
+			if (initSubtitle == "") {
+				subtitleElement.style.display = "none";
+			}
+
+			if (initTitle) {
+				titleElement.innerText = initTitle;
+				document.title = initTitle;
+			}
+			if (initSubtitle) {
+				subtitleElement.innerText = initSubtitle;
+			}
+			progressAnnotationElement.innerText = getAnnotation(currentValue, initMaxValue);
+			progressLineElement.style.width = getProgressWidth(currentValue, initMaxValue);
+		
+			let gatheredContent = null;
+			let lastTimeNewContentFound = new Date().getTime();
+			let closingTimeout = null;
+			let postCompletionTimeout = null;
+			let closingAfterInactivityCounter = initAutoCloseSeconds;
+			let postCompletionClosingCounter = initPostCompletionSeconds;
+			let subItemCount = 1;
+			let isProgressBarZoneMinimized = false;
+			let isAutoCloseCancelled = false;
+			let progressValueCount = 0;
+
+			let mainInterval = setInterval(() => {
+				/** @type {HTMLElement} */
+				const scriptContainer = document.getElementById("script-container");
+				if (scriptContainer.children.length > 0) {
+					scriptContainer.removeChild(scriptContainer.children[0]);
+				}
+				const s = document.createElement("script");
+				s.type = "text/javascript";
+				s.onerror = function (a, b, c, d, e) { clearInterval(mainInterval); mainInterval = null; throw Error(`Javascript file could not be loaded from ${jsFilePath}`); };
+				s.src = (jsFilePath && !jsFilePath.includes("%"))? jsFilePath : (() => { throw Error("JavaScript file path not initialized") })()
+				
+				s.onload = function () {
+					if (JSON.stringify(scriptContent) != JSON.stringify(gatheredContent)) {
+						if (closingTimeout != null) {
+							clearInterval(closingTimeout);
+							closingTimeout = null;
+							closingAfterInactivityCounter = initAutoCloseSeconds;
+							resetAutoCloseProgress();
+						}
+						lastTimeNewContentFound = new Date().getTime();
+						gatheredContent = scriptContent;
+						if (scriptContent.line_1 != undefined) {
+							line_1_element.innerText = scriptContent.line_1;
+						}
+						if (scriptContent.html_line_1 != undefined) {
+							line_1_element.innerHTML = scriptContent.html_line_1;
+						}
+						if (scriptContent.line_2 != undefined) {
+							line_2_element.innerText = scriptContent.line_2;
+						}
+						if (scriptContent.html_line_2 != undefined) {
+							line_2_element.innerHTML = scriptContent.html_line_2;
+						}
+						if (scriptContent.line_3 != undefined) {
+							line_3_element.innerText = scriptContent.line_3;
+						}
+						if (scriptContent.html_line_3 != undefined) {
+							line_3_element.innerHTML = scriptContent.html_line_3;
+						}
+						const hasErrorInContent = scriptContent.error != undefined || scriptContent.html_error != undefined;
+						const hasErrorValueInContent = (hasErrorInContent && ((scriptContent.error != undefined && scriptContent.error != "") || (scriptContent.html_error != undefined && scriptContent.html_error != "")));
+						if (hasErrorInContent) {
+							errorElement.style.display = "block";
+							if (scriptContent.error != undefined) {
+								errorElement.innerText = scriptContent.error;
+							} else {
+								errorElement.innerHTML = scriptContent.html_error;
+							}
+							if (hasErrorValueInContent && (scriptContent.progressValue == undefined || scriptContent.progressValue == currentValue)) {
+								const relatedMarkerElementSearch = document.querySelectorAll(`[data-marker]`);
+								if (relatedMarkerElementSearch.length > 0) {
+									const relatedMarker = relatedMarkerElementSearch[relatedMarkerElementSearch.length - 1];
+									if (!relatedMarker.classList.contains("error")) { relatedMarker.classList.add("error"); }
+								}
+							}
+						} else {
+							errorElement.style.display = "none";
+							errorElement.innerText = "";
+						}
+						if (scriptContent.title != undefined) {
+							initTitle = scriptContent.title;
+							document.title = initTitle;
+							titleElement.innerText = scriptContent.title;
+						}
+
+						if (typeof(scriptContent.subtitle) == "string" && scriptContent.subtitle.length > 0) {
+							initSubtitle = scriptContent.subtitle;
+							subtitleElement.innerText = scriptContent.subtitle;
+							subtitleElement.style.display = "block";
+						} else if (scriptContent.subtitle === null) {
+							subtitleElement.style.display = "none";
+						}
+
+						if (typeof(scriptContent.html_subtitle) == "string" && scriptContent.html_subtitle.length > 0) {
+							initSubtitle = scriptContent.html_subtitle;
+							subtitleElement.innerHTML = scriptContent.html_subtitle;
+							subtitleElement.style.display = "block";
+						} else if (scriptContent.html_subtitle === null) {
+							subtitleElement.style.display = "none";
+						}
+
+						if (scriptContent.progressValue != undefined) {
+							progressAnnotationElement.innerText = getAnnotation(scriptContent.progressValue, initMaxValue);
+							progressLineElement.style.width = getProgressWidth(scriptContent.progressValue, initMaxValue);
+							if (scriptContent.progressValue != currentValue) {
+								setStepTimer();
+								if (currentValue == initValue && globalDurationInterval == null) {
+									setGlobalDurationTimer();
+								}
+								const newMarkerItem = document.createElement("span");
+								newMarkerItem.setAttribute("data-marker", scriptContent.progressValue);
+								newMarkerItem.classList.add("step-marker");
+								newMarkerItem.innerText = scriptContent.progressValue;
+								if (hasErrorValueInContent) { newMarkerItem.classList.add("error"); }
+								newMarkerItem.title = "In Progress...";
+								newMarkerItem.onclick = function () {
+									const dataProgressElems = document.querySelectorAll(`[data-progress-value-index="${this.getAttribute("data-marker")}"]`);
+									if (dataProgressElems.length) {
+										dataProgressElems[0].scrollIntoView();
+									}
+								};
+								progressLineElement.append(newMarkerItem);
+								currentValue = scriptContent.progressValue;
+							}
+						} else if (scriptContent.progressMaxValue) {
+							currentValue = 0;
+							initMaxValue = scriptContent.progressMaxValue;
+							progressAnnotationElement.innerText = getAnnotation(currentValue, scriptContent.progressMaxValue);
+							progressLineElement.style.width = getProgressWidth(currentValue, scriptContent.progressMaxValue);
+						} else if (scriptContent.progressValue != undefined) {
+							if (typeof(scriptContent.progressValue) != "number") {
+								const errorMessage = "progressValue was not a number";
+								alert(errorMessage);
+								throw Error(errorMessage);
+							}
+							if (scriptContent.progressValue < 0) {
+								const errorMessage = "progressValue was less than 0";
+								alert(errorMessage);
+								throw Error(errorMessage);
+							}
+							if (scriptContent.progressValue > initMaxValue) {
+								const errorMessage = `${scriptContent.progressValue} exceeded maximum of ${initMaxValue}`;
+								alert(errorMessage);
+								throw Error(errorMessage);
+							}
+							progressAnnotationElement.innerText = getAnnotation(scriptContent.progressValue, initMaxValue);
+							progressLineElement.style.width = getProgressWidth(scriptContent.progressValue, initMaxValue);
+
+						}
+						addToPastList(scriptContent);
+						if (scriptContent.isFatalError === true) {
+							window.onbeforeunload = null;
+							notificationMessageElement.parentElement.style.display = "block";
+							notificationMessageElement.innerText = "FATAL ERROR ENCOUNTERED";
+							notificationMessageElement.style.fontWeight = "bold";
+							notificationMessageElement.style.color = "#F00";
+							clearInterval(mainInterval);
+							mainInterval = null;
+							clearStepTimerAtEnd("#B50000");
+							return;
+						}
+						if (scriptContent.END === true) {
+							window.onbeforeunload = null;
+							const errorItems = document.querySelectorAll("[data-marker].error");
+							if (errorItems.length > 0) {
+								notificationMessageElement.parentElement.style.display = "block";
+								circleProgressElement.style.display = "none";
+								inactivityCounterElement.style.display = "none";
+								isAutoCloseCancelled = true;
+								keepOpenElement.innerText = "Close";
+								notificationMessageElement.innerText = `Completed with Errors (${errorItems.length})`;
+								notificationMessageElement.style.color = "rgb(241 0 0)";
+								notificationMessageElement.style.fontWeight = "bold";
+								notificationMessageElement.style.fontSize = "1.8em";
+							} else {
+								if (initPostCompletionSeconds > 0) {
+									notificationMessageElement.parentElement.style.display = "block";
+									postCompletionTimeout = setInterval(() => {
+										if (postCompletionClosingCounter == 0) {
+											window.close();
+										}
+										inactivityCounterElement.innerText = postCompletionClosingCounter.toString();
+										notificationMessageElement.innerHTML = `<span style="font-weight:bold;font-size:1.5em;color:#0d6105;">Process complete</span><br/><span>Closing in ${initPostCompletionSeconds} seconds.</span>`;
+										postCompletionClosingCounter--;
+									}, 1000);
+									startAutoCloseProgress(postCompletionClosingCounter);
+								}
+							}
+							clearInterval(mainInterval);
+							mainInterval = null;
+							clearStepTimerAtEnd("#119922");
+							stopGlobalTimer();
+						}
+					} else {
+						if (closingTimeout != null) {
+							return;
+						}
+						if (new Date(new Date().getTime() - lastTimeNewContentFound).getMinutes() > initInactivityTimeoutMinutes) {
+							window.onbeforeunload = null;
+							const message = `${initInactivityTimeoutMinutes} minute(s) since new content was found. Closing in ${initAutoCloseSeconds} seconds.`;
+							notificationMessageElement.parentElement.style.display = "block";
+							clearStepTimerAtEnd("#B50000");
+							stopGlobalTimer();
+							closingTimeout = setInterval(() => {
+								if (closingAfterInactivityCounter == 0) {
+									window.close();
+								}
+								notificationMessageElement.innerText = message;
+								inactivityCounterElement.innerText = closingAfterInactivityCounter.toString();
+								closingAfterInactivityCounter--;
+							}, 1000);
+							startAutoCloseProgress(closingAfterInactivityCounter);
+						}
+					}
+				};
+				scriptContainer.append(s);
+			}, initLoopMilliseconds);
+		};
+	</script>
+</head>
+<body>
+	<span id="meta-heading">
+		<span style="float:left;cursor:pointer;" onclick="(function () { alert(`BrowserMonitor progress utility by Vasily Hall (VBAS LLC), 2021\n\nIf you wish to keep the records of the progress, do NOT refresh the page; use right-click and Save-As to save the page with its data.`); })()">&#x2754;</span>
+		BrowserMonitor Script Progress Utility
+		<span id="color-marker">
+			<span>
+				&nbsp;&nbsp;<script>var d = new Date();document.write(d.toLocaleDateString() + " " + d.toLocaleTimeString());</script>
+			</span>
+		</span>
+	</span>
+	<p id="error-display" style="display: none;"></p>
+	<div id="script-container"></div>
+	<h1 id="title"></h1>
+	<h2 id="subtitle"></h2>
+	<div id="main" class="open">
+		<div id="progress">
+			<div id="progress-line" title="Click the scrollbar and use arrow keys, or hold shift and use the mousewheel to scroll overflowing items."></div>
+			<span id="progress-annotation"></span>
+		</div>
+		<p id="lines">
+			<span id="line_1"></span><br/>
+			<span id="line_2"></span><br/>
+			<span id="line_3"></span>
+			<span id="error" style="display: none;" class="error-item"></span>
+		</p>
+		<p id="notifications" style="display: none;">
+			<span id="notification-message"></span>
+			<br/>
+			<svg height="100" width="100" id="circle-progress" style="opacity: 0;">
+				<circle cx="50" cy="50" r="40" stroke="#B50000" stroke-width="6" fill="#FFF" />
+			</svg> 
+			<span id="inactivity-counter">&nbsp;</span>
+			<br/>
+			<button type="button" id="keep-open" style="display: none;">Keep Open</button>
+		</p>
+		<span id="toggle-button">&#x1F53C;</span>
+		<span id="global-timer"><span>&#9203;&nbsp;</span><span>0:00</span></span>
+		<span id="step-timer"><span>&#9201;&nbsp;</span><span>0:00</span></span>
+	</div>
+	<hr style="width:calc(100% - 10px)">
+	<table id="past-list">
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Value</th>
+			</tr>
+		</thead>
+		<tbody></tbody>
+	</table>
+</body>
+</html>
