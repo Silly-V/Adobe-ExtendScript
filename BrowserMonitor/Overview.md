@@ -37,6 +37,6 @@ The very last javascript file written by the last execution will be picked up by
 
 [➡ Go to Documentation](Documentation.md)
 
-[➡ Go to Code Example](Code%20Example.md)
+[➡ Go to Code Example](Code-Example.md)
 
 [⬅ Back to README](README.md)

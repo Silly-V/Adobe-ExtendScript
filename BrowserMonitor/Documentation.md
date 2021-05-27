@@ -23,7 +23,7 @@ The constructor takes the following parameters:
 | title | `string` | Optional | The top heading and page title.|
 | subtitle | `string` | Optional | A subtitle.|
 | htmlTemplatePath | `string` | Optional | Optional path to a stand-alone HTML template text file. This file must have special markers inside to replace (Ex: %REPLACE_ME%). |
-| timeoutOptions | [`BrowserMonitorTimeoutOptions`](#BrowserMonitorTimeoutOptions%20Object) | Optional | Optional object with auto-closing options. |
+| timeoutOptions | [`BrowserMonitorTimeoutOptions`](#BrowserMonitorTimeoutOptions-Object) | Optional | Optional object with auto-closing options. |
 
 ## BrowserMonitor Properties
 These properties help keep track of a `BrowserMonitor`'s progress and can be used by the container program to see
@@ -31,13 +31,13 @@ These properties help keep track of a `BrowserMonitor`'s progress and can be use
 | Name | Type | Description |
 |------|------|-------------|
 | folder | `string` | The folder where the `BrowserMonitor` will write the HTML and JS files. |
-| htmlTemplate | `string` | An entire HTML string embedded in the `BrowserMonitor` class as a string, or a dynamically-obtained string read from a specified file path [`htmlTemplatePath`](#BrowserMonitor%20Contructor%20Arguments). |
+| htmlTemplate | `string` | An entire HTML string embedded in the `BrowserMonitor` class as a string, or a dynamically-obtained string read from a specified file path [`htmlTemplatePath`](#BrowserMonitor-Contructor-Arguments). |
 | maxValue | `number` | The maximum value in the process. |
 | currentValue | `string` | The current value in the process. |
 | title | `string` | The string which will become the page title on initialization of the HTML file. |
 | subtitle | `string` | The string which will become the page title on initialization of the HTML file. |
 | key | `string` | A unique string which is appended to the base-name of the HTML and JS files, allowing multiple `BrowserMonitor` objects to write unique files to the same folder. |
-| timeoutOptions | [`BrowserMonitorTimeoutOptions`](#BrowserMonitorTimeoutOptions%20Object) | Timing options which govern intervals in the HTML file. |
+| timeoutOptions | [`BrowserMonitorTimeoutOptions`](#BrowserMonitorTimeoutOptions-Object) | Timing options which govern intervals in the HTML file. |
 
 ## BrowserMonitor Methods
 
@@ -87,7 +87,7 @@ The argument to the `update` method can contain any of these properties, but one
 | meta_3 | `string` | Optional | Arbitrary value which is not displayed in the message area but gets added to the collected data list below. |
 | meta_4 | `string` | Optional | Arbitrary value which is not displayed in the message area but gets added to the collected data list below. |
 
-[➡ Go to Code Example](Code%20Example.md)
+[➡ Go to Code Example](Code-Example.md)
 
 [➡ Go to Overview](Overview.md)
 
