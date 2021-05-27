@@ -87,7 +87,7 @@ The argument to the `update` method can contain any of these properties, but one
 | meta_3 | `string` | Optional | Arbitrary value which is not displayed in the message area but gets added to the collected data list below. |
 | meta_4 | `string` | Optional | Arbitrary value which is not displayed in the message area but gets added to the collected data list below. |
 
-[➡ Go to Code Example](Code-Example.md)
+[➡ Go to Code Example](Code%20Example.md)
 
 [➡ Go to Overview](Overview.md)
 
