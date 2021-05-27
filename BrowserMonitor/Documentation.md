@@ -26,7 +26,7 @@ The constructor takes the following parameters:
 | timeoutOptions | [`BrowserMonitorTimeoutOptions`](#BrowserMonitorTimeoutOptions-Object) | Optional | Optional object with auto-closing options. |
 
 ## BrowserMonitor Properties
-These properties help keep track of a `BrowserMonitor`'s progress and can be used by the container program to see
+These properties help keep track of a `BrowserMonitor`'s progress and can be used by the container program to see current values for any reason.
 
 | Name | Type | Description |
 |------|------|-------------|
