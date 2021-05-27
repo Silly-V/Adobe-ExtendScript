@@ -1,5 +1,5 @@
 # HTML Template
-The folder _HTML Template_ contains the files _BrowserMonitor-template.html_ and _BrowserMonitor-template.js_. These are non-minified files that one can modify and practice with by opening the HTML file in the browser and saving some different text to the JS file. A custom version can be made and referenced in the JSX script via an argument to the `BrowserMonitor` [contructor](Documentation.md#BrowserMonitor-Contructor-Arguments).
+The folder _HTML Template_ contains the files _BrowserMonitor-template.html_ and _BrowserMonitor-template.js_. These are non-minified files that one can modify and practice with by opening the HTML file in the browser and saving some different text to the JS file. A custom version can be made and referenced in the JSX script via an argument to the `BrowserMonitor` [constructor](Documentation.md#BrowserMonitor-Constructor-Arguments).
 
 # BrowserMonitorTest
 This example shows the usage of the `BrowserMonitor` in the context of iterating over numerous shapes in Illustrator and applying a random CMYK color to them under certain conditions.

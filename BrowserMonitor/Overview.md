@@ -1,7 +1,7 @@
 # BrowserMonitor Documentation
 
 ## How it Works
-The way it works is: the JSX file writes an HTML file which includes a dynamically-configured path to a JavaScript file. The HTML file contains a `<script>` tag whose script repeately inserts the JavaScript file which contains an object via a `setInterval` method. Upon an successful insertion it checks the JSON version of the data object with a previously-captured object. If it detects a difference, a page-updating method is activated. The running JSX script writes to that same JS path during (arbitrary) key points in execution.
+The way it works is: the JSX file writes an HTML file which includes a dynamically-configured path to a JavaScript file. The HTML file contains a `<script>` tag whose script repeatedly inserts the JavaScript file which contains an object via a `setInterval` method. Upon an successful insertion it checks the JSON version of the data object with a previously-captured object. If it detects a difference, a page-updating method is activated. The running JSX script writes to that same JS path during (arbitrary) key points in execution.
 
 While an Adobe app goes unresponsive in the UI, it continues the process and is capable of writing light-weight text into the JS file with minimal time. When the `BrowserMonitor` is set to start with the `begin` method it writes the HTML file to its configured destination and launches it in the default web browser using `File.execute()`.
 
@@ -21,7 +21,7 @@ The html portion of the `BrowserMonitor` is stored in a static and encoded state
 	If configured to be a positive integer (representing seconds), the post-completion interval launches a count-down to window-close when the process comes to an end. The parameter to effect this behavior can be set to a value which will prevent this timer from being activated.
 
 ### Custom HTML Updates
-Using the `BrowserMonitor`'s `update()` method it is possible to inject custom HTML including `<script>` tags into the web page. While this can be easily used for simple notification changes, an injected HTML string with a script could also be used for remote data pushing and fetching. This could expand the automated workflow further. For example on a Mac it is possible to add Folder Actions to a folder, it could be the Downloads folder. The progress web page could be made to send web requests to some end-point and download new instructions to where a Folder Action can digest them and launch a JSX script. This JSX script would have to avoid overwriting the HTML file, but it could obtain the updated `BrowserMonitor` `progressValue` from the JS file and also ensure to remove the HTNL file after a certain condition.
+Using the `BrowserMonitor`'s `update()` method it is possible to inject custom HTML including `<script>` tags into the web page. While this can be easily used for simple notification changes, an injected HTML string with a script could also be used for remote data pushing and fetching. This could expand the automated workflow further. For example on a Mac it is possible to add Folder Actions to a folder, it could be the Downloads folder. The progress web page could be made to send web requests to some end-point and download new instructions to where a Folder Action can digest them and launch a JSX script. This JSX script would have to avoid overwriting the HTML file, but it could obtain the updated `BrowserMonitor` `progressValue` from the JS file and also ensure to remove the HTML file after a certain condition.
 Otherwise, an injected script could simply send updates to an end-point which could take the local log data and display it on a cloud-based dashboard.
 
 ## JSX
@@ -33,10 +33,10 @@ The progress monitor is updated by writing a JS file to a destination where it w
 The `BrowserMonitor` is a very generic program that does not store its collected data in the filesystem and a refresh to the browser page would cause a data loss. One can still collect the page content data from a process by keeping the window open and using right-click Save-As on the browser page.
 Once the page is saved thus, it can be opened and edited to present the data as it was last seen, minus some interactive features.
 > TODO:
-The very last javascript file written by the last execution will be picked up by the interval script, so until such time that this is edited, the saved page will either add one more END line-item to the stack. Also, it may hide the progress-bar contents, for now simply edit the page using a browser inspector or a change to the page contents using HTML & CSS skills.
+The very last javascript file written by the last execution will be picked up by the interval script, so until such time that this is edited, the saved page will either add one more END line-item to the stack or it may hide the progress-bar contents. For now simply edit the page using a browser inspector or a change to the page contents using HTML & CSS skills.
 
 [➡ Go to Documentation](Documentation.md)
 
-[➡ Go to Code Example](Code-Example.md)
+[➡ Go to Code Example](Code%20Example.md)
 
 [⬅ Back to README](README.md)

@@ -12,7 +12,7 @@ The `BrowserMonitor` workflow is:
  3. Update the monitor by using the `bm.update({ ... update properties })` method.
  4. At the end of your batch process, stop the monitor by using the `bm.end()` method.
 
-## BrowserMonitor Contructor Arguments
+## BrowserMonitor Constructor Arguments
 The constructor takes the following parameters:
 
 | Name | Type | Required | Description |
@@ -31,7 +31,7 @@ These properties help keep track of a `BrowserMonitor`'s progress and can be use
 | Name | Type | Description |
 |------|------|-------------|
 | folder | `string` | The folder where the `BrowserMonitor` will write the HTML and JS files. |
-| htmlTemplate | `string` | An entire HTML string embedded in the `BrowserMonitor` class as a string, or a dynamically-obtained string read from a specified file path [`htmlTemplatePath`](#BrowserMonitor-Contructor-Arguments). |
+| htmlTemplate | `string` | An entire HTML string embedded in the `BrowserMonitor` class as a string, or a dynamically-obtained string read from a specified file path [`htmlTemplatePath`](#BrowserMonitor-Constructor-Arguments). |
 | maxValue | `number` | The maximum value in the process. |
 | currentValue | `string` | The current value in the process. |
 | title | `string` | The string which will become the page title on initialization of the HTML file. |
@@ -48,7 +48,7 @@ These properties help keep track of a `BrowserMonitor`'s progress and can be use
 | update | `void` | Public | Writes an object into a JavaScript file to be consumed by the HTML file's interval script. |
 | begin | `void` | Public | Writes both the JS and HTML files, then executes the HTML file to bring it up in the web browser.
 | end | `void` | Public | Writes an `{ END : true }` message to the JS file, ending the process.
-| toJSON | `object` | Public | Used to prepare the `BrowserMonitor` instace for the `JSON.stringify()` method. Removes the [`htmlTemplate`](#BrowserMonitor-Properties) property string to avoid JSON-related problems. This method is useful when transferring this object to a child process script such as a separate code block or file to be executed in a different application via `BridgeTalk`.
+| toJSON | `object` | Public | Used to prepare the `BrowserMonitor` instance for the `JSON.stringify()` method. Removes the [`htmlTemplate`](#BrowserMonitor-Properties) property string to avoid JSON-related problems. This method is useful when transferring this object to a child process script such as a separate code block or file to be executed in a different application via `BridgeTalk`.
 | fromJSON | `BrowserMonitor` | Static | Creates an instance of the `BrowserMonitor` from a JSON string.
 
 ## BrowserMonitorTimeoutOptions Object
