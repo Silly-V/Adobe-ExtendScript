@@ -298,6 +298,9 @@ function BrowserMonitor (writeFolderPath, key, maxValue, title, subtitle, htmlTe
 	/** @type {string} - Unique identifier string. */
 	this.key = key;
 
+	/** @type {BrowserMonitorJsContent} */
+	this.lastContent = null;
+
 	this.timeoutOptions = /** @type {BrowserMonitorTimeoutOptions} */ ({
 		inactivityTimeoutMinutes : 10,
 		autoCloseSeconds : 160,
@@ -315,6 +318,7 @@ function BrowserMonitor (writeFolderPath, key, maxValue, title, subtitle, htmlTe
 	 * @param {BrowserMonitorJsContent} jsContent - The javascript content to write as a .js file.
 	 */
 	this.writeJs = function (jsContent) {
+		this.lastContent = jsContent;
 		var writeStr = "var scriptContent = " + JSON.stringify(jsContent);
 		var writeResult = writeFile(this.folder + "/" + jsFileName, writeStr, "UTF-8");
 		$.sleep(self.timeoutOptions.loopMilliseconds + 90); // let the file be written with a timeout to where the querying html file has time to read it.
@@ -379,6 +383,7 @@ function BrowserMonitor (writeFolderPath, key, maxValue, title, subtitle, htmlTe
 		this.writeJs(initJsContent);
 		this.writeHtml();
 		File(this.folder + "/" + htmlFileName).execute();
+		$.sleep(self.timeoutOptions.loopMilliseconds);
 	};
 
 	this.end = function () {
